@@ -128,10 +128,11 @@ class TestTarot:
         card_name = tarot.drawn_cards[0]
 
         # Remove the card from the library
-        del tarot.library[card_name]
+        os.remove(f'{directory}/{card_name}')
 
         # Show the image of the non-existent card
-        tarot.show(card_name)
+        with pytest.raises(ValueError):
+            tarot.show(card_name)
 
 
     # Draw zero cards
