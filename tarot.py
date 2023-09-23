@@ -159,6 +159,8 @@ class Tarot:
             number (int): The number of cards to draw. Defaults to 1.
         """
         
+        self.drawn_cards = [] # clear the drawn cards
+
         deck = list(self.library)
 
         if number > len(deck):
