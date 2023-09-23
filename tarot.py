@@ -3,6 +3,10 @@ from PIL import Image
 import random
 import json
 import os
+import urllib.request
+import zipfile
+import io
+from tqdm import tqdm  # Import tqdm for progress bar
 
 """
 A class for generating a library of tarot cards from a given deck directory.
@@ -42,7 +46,7 @@ class Tarot:
         show(self, card): Shows the image of a card.
     """
 
-    def __init__(self, deck_directory: str):
+    def __init__(self, deck_directory: str, auto_download = False):
         """
         Initializes the Tarot class with the deck directory.
 
@@ -52,6 +56,17 @@ class Tarot:
         self.deck_directory = deck_directory
         self.library_file = f'{self.deck_directory}/library.json'
         self.drawn_cards = []
+
+        with open('config.json', "r") as json_file:
+            self.config = json.load(json_file)
+
+        if auto_download:
+           zip_data = self.download(self.config['rider-waite'])
+           with open('.tmp/deck.zip', 'rb') as file:
+            file_contents = file.read()
+           bytes_io = io.BytesIO(file_contents)
+           with zipfile.ZipFile(bytes_io, 'r') as zip_ref:
+            zip_ref.extractall(self.deck_directory)
 
         if not os.path.isfile(self.library_file):
             self.generate_library()
@@ -78,7 +93,7 @@ class Tarot:
                 hierarchy, card_name = self.retrieve_name(file)
                 library[file] = {'hierarchy': hierarchy, 'arcane': card_name}
 
-        self.library = library # json.dumps(library, indent=2)
+        self.library = library
         self.save_library()
 
     def load_library(self):
@@ -157,3 +172,19 @@ class Tarot:
             draw_card = random.choice(deck)
             self.drawn_cards.append(draw_card)
             deck.remove(draw_card)
+
+    def download(self, url):
+        if not os.path.isdir('.tmp'):
+            os.makedirs('.tmp')
+
+        response = urllib.request.urlopen(url)
+        total_size = int(response.info().get('Content-Length', 0))
+        block_size = 1024  # Adjust the block size as needed
+        
+        with open('.tmp/deck.zip', 'wb') as file, tqdm(
+            total=total_size, unit='B', unit_scale=True, unit_divisor=1024
+        ) as bar:
+            for data in iter(lambda: response.read(block_size), b''):
+                file.write(data)
+                bar.update(len(data))
+        

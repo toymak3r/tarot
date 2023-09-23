@@ -186,3 +186,45 @@ class TestTarot:
         assert hierarchy != ""
         assert card_name != ""
 
+
+    # Auto-download deck
+    def test_auto_download_deck(self):
+        # Create an instance of the Tarot class with auto_download set to True
+        tarot = Tarot(directory, auto_download=True)
+
+        # Check if the library file exists
+        assert os.path.isdir(directory)
+
+        # Check if the library is not empty
+        assert tarot.library != ""
+
+        # Check if the drawn_cards list is empty
+        assert len(tarot.drawn_cards) == 0
+
+    # Load library from non-existent file
+    def test_load_library_from_non_existent_file(self):
+        # Create an instance of the Tarot class with a non-existent library file
+        tarot = Tarot(directory)
+
+        # Check if the library is generated and not empty
+        assert tarot.library != ""
+
+
+    # Show image of a card with non-existent file
+    def test_show_image_of_nonexistent_file(self):
+        # Create an instance of the Tarot class
+        tarot = Tarot(directory)
+
+        # Draw a card from the library
+        tarot.draw()
+
+        # Get the name of the drawn card
+        card_name = tarot.drawn_cards[0]
+
+        # Remove the card from the library
+        os.remove(f'{directory}/{card_name}')
+
+        # Show the image of the non-existent card
+        with pytest.raises(ValueError):
+            tarot.show(card_name)
+
