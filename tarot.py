@@ -22,42 +22,6 @@ Methods:
     draw(self, number = 1): Randomly draws a specified number of cards from the library.
     show(self, card): Shows the image of a card.
 """
-"""
-A class for generating a library of tarot cards from a given deck directory.
-
-Args:
-    deck_directory (str): The directory path where the tarot card images are located.
-
-Attributes:
-    deck_directory (str): The directory path where the tarot card images are located.
-    library (str): The library of tarot cards as a JSON string.
-
-Methods:
-    __init__(self, deck_directory: str): Initializes the class with the deck directory.
-    generate_library(self, path: str = '') -> str: Generates a library of tarot cards and returns it as a JSON string.
-    save_library(self): Saves the library to a file.
-    retrieve_name(self, file: str) -> str: Retrieves the major or minor hierarchy and card name from a given file name.
-    draw(self, number = 1): Randomly draws a specified number of cards from the library.
-    show(self, card): Shows the image of a card.
-"""
-"""
-A class for generating a library of tarot cards from a given deck directory.
-
-Args:
-    deck_directory (str): The directory path where the tarot card images are located.
-
-Attributes:
-    deck_directory (str): The directory path where the tarot card images are located.
-    library (str): The library of tarot cards as a JSON string.
-
-Methods:
-    __init__(self, deck_directory: str): Initializes the class with the deck directory.
-    generate_library(self, path: str = '') -> str: Generates a library of tarot cards and returns it as a JSON string.
-    save_library(self): Saves the library to a file.
-    retrieve_name(self, file: str) -> str: Retrieves the major or minor hierarchy and card name from a given file name.
-    draw(self, number = 1): Randomly draws a specified number of cards from the library.
-    show(self, card): Shows the image of a card.
-"""
 class Tarot:
     """
     A class for generating a library of tarot cards from a given deck directory.
@@ -113,8 +77,9 @@ class Tarot:
             for file in os.listdir(path):
                 hierarchy, card_name = self.retrieve_name(file)
                 library[file] = {'hierarchy': hierarchy, 'arcane': card_name}
-        
-        self.library = json.dumps(library, indent=2)
+
+        self.library = library # json.dumps(library, indent=2)
+        self.save_library()
 
     def load_library(self):
         """
@@ -148,9 +113,10 @@ class Tarot:
 
         if match:
             hierarchy = match.group(1)
-            card_name = match.group(3).replace("_"," ")
+            card_name = match.group(3).replace("_", " ")
+
         return hierarchy, card_name
-    
+
     def show(self, card):
         """
         Shows the image of a card.
@@ -158,24 +124,34 @@ class Tarot:
         Args:
             card: The name of the card to show.
         """
+        
         file_path = f'{self.deck_directory}/{card}'
+
+        if not os.path.isfile(file_path):
+            raise ValueError('This card do not exist!')
+
         img = Image.open(file_path)
         image_size = img.size
         image_size = image_size[0]//2, image_size[1]//2
         card = img.resize(image_size)
         card.show()
 
-    def draw(self, number = 1):
+    def draw(self, number=1):
         """
         Randomly draws a specified number of cards from the library.
 
         Args:
             number (int): The number of cards to draw. Defaults to 1.
         """
-        if number > len(self.library):
-            raise ValueError('Number of cards bigger than deck!')
-
+        
         deck = list(self.library)
+
+        if number > len(deck):
+            raise ValueError('Number of cards bigger than deck!')
+        
+        if number < 1:
+            raise ValueError('Number of cards negative!')
+        
 
         for i in range(number):
             draw_card = random.choice(deck)
