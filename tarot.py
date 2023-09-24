@@ -146,9 +146,12 @@ class Tarot:
             raise ValueError('This card do not exist!')
 
         img = Image.open(file_path)
+        index = self.drawn_cards_position[self.drawn_cards.index(card)]
         image_size = img.size
         image_size = image_size[0]//2, image_size[1]//2
         card = img.resize(image_size)
+        if index == 'reversed':
+            card = card.rotate(180.0)
         card.show()
 
     def draw(self, number=1):
@@ -158,8 +161,9 @@ class Tarot:
         Args:
             number (int): The number of cards to draw. Defaults to 1.
         """
-        
-        self.drawn_cards = [] # clear the drawn cards
+        # clear the drawn cards
+        self.drawn_cards = [] 
+        self.drawn_cards_position = [] 
 
         deck = list(self.library)
 
@@ -169,10 +173,11 @@ class Tarot:
         if number < 1:
             raise ValueError('Number of cards negative!')
         
-
         for i in range(number):
             draw_card = random.choice(deck)
+            position = random.choice(['reversed','regular'])
             self.drawn_cards.append(draw_card)
+            self.drawn_cards_position.append(position)
             deck.remove(draw_card)
 
     def download(self, url):
