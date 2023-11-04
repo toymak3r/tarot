@@ -1,3 +1,21 @@
+"""
+A class for generating a library of tarot cards from a given deck directory.
+
+Args:
+    deck_directory (str): The directory path where the tarot card images are located.
+
+Attributes:
+    deck_directory (str): The directory path where the tarot card images are located.
+    library (str): The library of tarot cards as a JSON string.
+
+Methods:
+    __init__(self, deck_directory: str): Initializes the class with the deck directory.
+    generate_library(self, path: str = '') -> str: Generates a library of tarot cards and returns it as a JSON string.
+    save_library(self): Saves the library to a file.
+    retrieve_name(self, file: str) -> str: Retrieves the major or minor hierarchy and card name from a given file name.
+    draw(self, number = 1): Randomly draws a specified number of cards from the library.
+    show(self, card): Shows the image of a card.
+"""
 import re
 from PIL import Image
 import random
@@ -7,6 +25,7 @@ import urllib.request
 import zipfile
 import io
 from tqdm import tqdm  # Import tqdm for progress bar
+from ascii_magic import AsciiArt
 
 """
 A class for generating a library of tarot cards from a given deck directory.
@@ -26,6 +45,8 @@ Methods:
     draw(self, number = 1): Randomly draws a specified number of cards from the library.
     show(self, card): Shows the image of a card.
 """
+
+
 class Tarot:
     """
     A class for generating a library of tarot cards from a given deck directory.
@@ -46,7 +67,7 @@ class Tarot:
         show(self, card): Shows the image of a card.
     """
 
-    def __init__(self, deck_directory: str, auto_download = False):
+    def __init__(self, deck_directory: str, auto_download=False):
         """
         Initializes the Tarot class with the deck directory.
 
@@ -61,12 +82,12 @@ class Tarot:
             self.config = json.load(json_file)
 
         if auto_download:
-           zip_data = self.download(self.config['rider-waite'])
-           with open('.tmp/deck.zip', 'rb') as file:
-            file_contents = file.read()
-           bytes_io = io.BytesIO(file_contents)
-           with zipfile.ZipFile(bytes_io, 'r') as zip_ref:
-            zip_ref.extractall(self.deck_directory)
+            self.download(self.config['rider-waite'])
+            with open('.tmp/deck.zip', 'rb') as file:
+                file_contents = file.read()
+            bytes_io = io.BytesIO(file_contents)
+            with zipfile.ZipFile(bytes_io, 'r') as zip_ref:
+                zip_ref.extractall(self.deck_directory)
 
         if not os.path.isfile(self.library_file):
             self.generate_library()
@@ -132,14 +153,14 @@ class Tarot:
 
         return hierarchy, card_name
 
-    def show(self, card):
+    def show(self, card, ASCII=False):
         """
         Shows the image of a card.
 
         Args:
             card: The name of the card to show.
         """
-        
+
         file_path = f'{self.deck_directory}/{card}'
 
         if not os.path.isfile(file_path):
@@ -152,7 +173,11 @@ class Tarot:
         card = img.resize(image_size)
         if index == 'reversed':
             card = card.rotate(180.0)
-        card.show()
+        if not ASCII:
+            card.show()
+        else:
+            card_ascii = AsciiArt.from_pillow_image(card)
+            card_ascii.to_terminal()
 
     def draw(self, number=1):
         """
@@ -162,20 +187,20 @@ class Tarot:
             number (int): The number of cards to draw. Defaults to 1.
         """
         # clear the drawn cards
-        self.drawn_cards = [] 
-        self.drawn_cards_position = [] 
+        self.drawn_cards = []
+        self.drawn_cards_position = []
 
         deck = list(self.library)
 
         if number > len(deck):
             raise ValueError('Number of cards bigger than deck!')
-        
+
         if number < 1:
             raise ValueError('Number of cards negative!')
-        
+
         for i in range(number):
             draw_card = random.choice(deck)
-            position = random.choice(['reversed','regular'])
+            position = random.choice(['reversed', 'regular'])
             self.drawn_cards.append(draw_card)
             self.drawn_cards_position.append(position)
             deck.remove(draw_card)
@@ -187,11 +212,10 @@ class Tarot:
         response = urllib.request.urlopen(url)
         total_size = int(response.info().get('Content-Length', 0))
         block_size = 1024  # Adjust the block size as needed
-        
+
         with open('.tmp/deck.zip', 'wb') as file, tqdm(
             total=total_size, unit='B', unit_scale=True, unit_divisor=1024
         ) as bar:
             for data in iter(lambda: response.read(block_size), b''):
                 file.write(data)
                 bar.update(len(data))
-        
