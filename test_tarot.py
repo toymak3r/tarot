@@ -6,6 +6,7 @@ import os
 
 directory = 'tmp'
 
+
 class TestTarot:
     # Draw one card from library
     def test_draw_one_card_from_library(self):
@@ -18,8 +19,8 @@ class TestTarot:
         # Check if the drawn_cards list has one card
         assert len(tarot.drawn_cards) == 1
 
-
     # Draw multiple cards from library
+
     def test_draw_multiple_cards_from_library(self):
         # Create an instance of the Tarot class
         tarot = Tarot(directory)
@@ -33,8 +34,8 @@ class TestTarot:
         # Check if the number of drawn cards is equal to the specified number
         assert len(tarot.drawn_cards) == 3
 
-
     # Show image of a card
+
     def test_show_image_of_card(self):
         # Create an instance of the Tarot class
         tarot = Tarot(directory)
@@ -48,15 +49,15 @@ class TestTarot:
         # Show the image of the drawn card
         tarot.show(card_name)
 
-
     # Generate library with default path
+
     def test_generate_library_with_default_path(self):
         tarot = Tarot(directory)
         tarot.generate_library()
         assert tarot.library != ""
 
-
     # Load library from file
+
     def test_load_library_from_file(self):
         # Create an instance of the Tarot class
         tarot = Tarot(directory)
@@ -64,8 +65,8 @@ class TestTarot:
         # Check if the library is not empty
         assert tarot.library != ""
 
-
     # Draw more cards than in the deck
+
     def test_draw_more_cards_than_in_deck(self):
         # Create an instance of the Tarot class
         tarot = Tarot(directory)
@@ -77,8 +78,8 @@ class TestTarot:
         with pytest.raises(ValueError):
             tarot.draw(100)
 
-
     # Draw negative number of cards
+
     def test_draw_negative_number_of_cards(self):
         # Create an instance of the Tarot class
         tarot = Tarot(directory)
@@ -87,8 +88,8 @@ class TestTarot:
         with pytest.raises(ValueError):
             tarot.draw(-1)
 
-
     # Draw one card from an empty deck
+
     def test_draw_one_card_from_empty_deck(self):
         # Create an instance of the Tarot class
         tarot = Tarot(directory)
@@ -103,8 +104,8 @@ class TestTarot:
         # Check if the drawn_cards list is empty
         assert len(tarot.drawn_cards) == 0
 
-
     # Save library to file
+
     def test_save_library_to_file(self):
         # Create an instance of the Tarot class
         tarot = Tarot(directory)
@@ -115,8 +116,8 @@ class TestTarot:
         # Check if the library file exists
         assert os.path.isfile(tarot.library_file)
 
-
     # Show image of a non-existent card
+
     def test_show_image_of_nonexistent_card(self):
         # Create an instance of the Tarot class
         tarot = Tarot(directory)
@@ -134,8 +135,8 @@ class TestTarot:
         with pytest.raises(ValueError):
             tarot.show(card_name)
 
-
     # Draw zero cards
+
     def test_draw_zero_cards(self):
         # Create an instance of the Tarot class
         tarot = Tarot(directory)
@@ -144,17 +145,18 @@ class TestTarot:
         with pytest.raises(ValueError):
             tarot.draw(0)
 
-
     # Load non-existent library file
+
     def test_load_non_existent_library_file(self):
-        # Create an instance of the Tarot class with a non-existent library file
+        # Create an instance of the Tarot class with
+        # a non-existent library file
         tarot = Tarot(directory)
 
         # Check if the library is generated and not empty
         assert tarot.library != ""
 
-
     # Draw all cards from the deck
+
     def test_draw_all_cards_from_deck(self):
         # Create an instance of the Tarot class
         tarot = Tarot(directory)
@@ -165,11 +167,12 @@ class TestTarot:
         # Draw all cards from the deck
         tarot.draw(len(tarot.library))
 
-        # Check if the number of drawn cards is equal to the number of cards in the library
+        # Check if the number of drawn cards is equal to
+        # the number of cards in the library
         assert len(tarot.drawn_cards) == len(tarot.library)
 
-
     # Retrieve major hierarchy and card name from file name
+
     def test_retrieve_major_hierarchy_and_card_name_from_file_name(self):
         # Create an instance of the Tarot class
         tarot = Tarot(directory)
@@ -186,8 +189,8 @@ class TestTarot:
         assert hierarchy != ""
         assert card_name != ""
 
-
     # Auto-download deck
+
     def test_auto_download_deck(self):
         # Create an instance of the Tarot class with auto_download set to True
         tarot = Tarot(directory, auto_download=True)
@@ -203,14 +206,15 @@ class TestTarot:
 
     # Load library from non-existent file
     def test_load_library_from_non_existent_file(self):
-        # Create an instance of the Tarot class with a non-existent library file
+        # Create an instance of the Tarot class with
+        # a non-existent library file
         tarot = Tarot(directory)
 
         # Check if the library is generated and not empty
         assert tarot.library != ""
 
-
     # Show image of a card with non-existent file
+
     def test_show_image_of_nonexistent_file(self):
         # Create an instance of the Tarot class
         tarot = Tarot(directory)
@@ -227,4 +231,3 @@ class TestTarot:
         # Show the image of the non-existent card
         with pytest.raises(ValueError):
             tarot.show(card_name)
-

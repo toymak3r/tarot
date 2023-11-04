@@ -1,9 +1,12 @@
 from rich import print
-from rich.prompt import Prompt, IntPrompt
+from rich.prompt import IntPrompt
 from tarot import Tarot
 
 from rich.panel import Panel
-print(Panel("Lets start your consultation...", title="[red]Tarot", subtitle=""))
+print(Panel("Lets start your consultation...",
+            title="[red]Tarot", subtitle=""))
+
+
 tarot = Tarot('.tmp')
 tarot.generate_library()
 
